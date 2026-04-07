@@ -41,6 +41,16 @@ features = [
     'Errors_Leading_To_Shot_Per_90', 'Challenges_Lost_Per_90', 'Age'
 ]
 
+coeff_images = {
+    0: 'Finishers.png',
+    1: 'Blockers.png',
+    2: 'Creators.png',
+    3: 'Press_Specialists.png',
+    4: 'Ball_Carriers.png',
+    5: 'Overlappers.png',
+    6: 'Box-box.png',
+}
+
 @st.cache_data
 def load_and_scale_data():
     df = pd.read_csv("dataset_hdbscan_clusters_5.csv")
@@ -94,7 +104,7 @@ the same tactical cluster or role.
 search_list = sorted(dataset['name_key_1'].unique())
 target_player = st.selectbox("Search for a Player:", 
                              search_list,
-                             index=None,
+                             index=None, 
                              placeholder="Search a name...")
 
 if target_player:
@@ -117,8 +127,29 @@ if target_player:
             use_container_width=True,
             hide_index=True
         )
+        st.write("")
+        st.write("")
 
+        st.info("""
+        **Please note:**
+        * Player's age is based on **2024/25 season**.
+        * Player Market Valuation is sourced from the **2025 Transfermarkt.com** Player Valuation data.
+        """)
 
+        st.divider()
+        st.markdown(f"### 🧬 What Defines this '{role}' Role?")
+        st.caption("Green bars: Positive influence | Red bars: Negative influence.")
+
+        # Get cluster ID from the dataset for the selected player
+        target_cluster = dataset[dataset['name_key_1'] == target_player.upper()]['tactical_roles_hdbscan'].values[0]
+
+        if target_cluster in coeff_images:
+            st.image(coeff_images[target_cluster], use_container_width=True)
+        else:
+            st.info("Feature importance visualization for this role (Hybrid Players) is not currently available.")
+
+st.write("")  
+st.write("")
 
 
 #Footer Navigation
