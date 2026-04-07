@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-st.subheader("Player Recruitment Engine")
-
 st.write("""
 Takes a Top Five European Team as input and returns the number of player(s) 
 the team has per tactical role.
@@ -88,10 +86,21 @@ st.write("Analyze squad depth across tactical roles using 2024/25 performance da
 
 # 5. Cascading Dropdowns (Stacked Vertically)
 leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Other']
-selected_league = st.selectbox("Step 1: Select a League", leagues)
+selected_league = st.selectbox(label = "Select League",
+                               options = leagues,
+                                index=None, 
+                                placeholder="Select a league...",
+                                label_visibility = "collapsed")
+
+st.write("")  
+st.write("")
 
 filtered_teams = sorted(dataset[dataset['primary_league'] == selected_league]['current_club'].unique())
-selected_team = st.selectbox("Step 2: Select a Team", filtered_teams)
+selected_team = st.selectbox(label = "Select a team",
+                               options = filtered_teams,
+                                index=None, 
+                                placeholder="Select a team...",
+                                label_visibility = "collapsed")
 
 # 6. The Analysis Logic
 def run_analysis(team_name):
@@ -119,12 +128,44 @@ if selected_team:
     
     st.divider()
     st.subheader(f"📊 Squad Profile: {selected_team}")
-    st.metric("Total Active Players (Stats Found)", total)
     
-    # Clean up the table display
+    # Using columns to keep the metric and a small note aligned
+    col_metric, col_note = st.columns([1, 2])
+    with col_metric:
+        st.metric("Total Players", total)
+    with col_note:
+        st.caption("Note: This count only includes players with at least 450 minutes played during the 2024/25 Season.")
+
+    # 8. High-Level Summary Table
+    st.markdown("### Role Distribution Summary")
     st.table(results)
 
-# 8. Footer Navigation
+    # 9. Detailed Player Breakdown (Option 1: Expanders)
+    st.write("") # Padding
+    st.markdown("### 👥 Squad Members by Tactical Role")
+    st.info("Click a role below to see the specific players in that role.")
+
+    # Filter the main dataset once for the selected team to save performance
+    team_data = dataset[dataset['current_club_upper'] == selected_team.upper()]
+
+    # Iterate through the role_names dict to keep the order consistent
+    for role_id, role_name in role_names.items():
+        # Get list of player names for this specific cluster
+        players_in_role = team_data[team_data['tactical_roles_hdbscan'] == role_id]['Player'].tolist()
+        
+        # Only show the expander if there are actually players in that role
+        if players_in_role:
+            # Sort names alphabetically for a professional look
+            players_in_role.sort()
+            
+            with st.expander(f"{role_name} ({len(players_in_role)})"):
+                # Join names with a bullet point or a clean comma
+                st.write(", ".join(players_in_role))
+        else:
+            # Optional: Show a "ghost" expander for empty roles to highlight the "Gap"
+            st.write(f"🔘 *No players identified as {role_name}*")
+
+# 10. Footer Navigation
 st.divider()
 col1, col2 = st.columns(2)
 with col1:
