@@ -10,12 +10,16 @@ Machine Learning algorithms along with football domain knowledge. These roles ar
 Goal Scorers, Blockers, Deep-Lying Playmakers, Box-to-Box, Press Specialists, Wingers, and Wingbacks.
 """)
 
-st.info("This research covers a single season (2024/25) only. Analysis across multiple seasons data would produce more stable role assignments.")
-
+st.info("""
+        This research covers a single season (2024/25) only. 
+        Analysis across multiple seasons data would produce more stable role assignments.
+        """)
+st.write("")  
+st.write("")
 st.caption("Please note that this project is only for educational purposes only.")
 
-st.image("streamlit_hdb_clusters.png", caption="Plot of the Tactical Role Clusters",
-         width='stretch')
+#st.image("streamlit_hdb_clusters.png", caption="Plot of the Tactical Role Clusters",
+         #width='stretch')
 
 
     
